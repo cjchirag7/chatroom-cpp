@@ -25,7 +25,7 @@ vector<terminal> clients;
 string def_col="\033[0m";
 string colors[]={"\033[31m", "\033[32m", "\033[33m", "\033[34m", "\033[35m","\033[36m"};
 int seed=0;
-mutex cout_mtx;
+mutex cout_mtx,clients_mtx;
 
 string color(int code);
 void set_name(int id, char name[]);
@@ -77,6 +77,7 @@ int main()
 		}
 		seed++;
 		thread t(handle_client,client_socket,seed);
+		lock_guard<mutex> guard(clients_mtx);
 		clients.push_back({seed, string("Anonymous"),client_socket,(move(t))});
 	}
 
@@ -148,6 +149,7 @@ void end_connection(int id)
 	{
 		if(clients[i].id==id)	
 		{
+			lock_guard<mutex> guard(clients_mtx);
 			clients[i].th.detach();
 			clients.erase(clients.begin()+i);
 			close(clients[i].socket);
@@ -177,7 +179,7 @@ void handle_client(int client_socket, int id)
 		if(strcmp(str,"#exit")==0)
 		{
 			// Display leaving message
-			string message=string(name)+string(" has left");
+			string message=string(name)+string(" has left");		
 			broadcast_message("#NULL",id);			
 			broadcast_message(id,id);						
 			broadcast_message(message,id);

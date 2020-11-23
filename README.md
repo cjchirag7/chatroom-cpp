@@ -2,6 +2,7 @@
 
 A chatroom built in C++ using the concepts of socket programming and multi-threading. It supports chatting among multiple clients.
 
+![](/screenshot.png)
 ## How to run
 
 1. Clone this repository
